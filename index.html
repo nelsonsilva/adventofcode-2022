@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <script type="module" src="https://cdn.jsdelivr.net/gh/vanillawc/wc-codemirror@1/index.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/gh/vanillawc/wc-codemirror@1/mode/python/python.js"></script>
+    <script src="pyscript.js" type="module"></script>
+    <title>Advent of Code 2022</title>
+    <link rel="icon" href="https://adventofcode.com/favicon.png">
+  </head>
+<body>
+  <select id="days" onchange="select(event.target.value)"></select>
+  <wc-codemirror id="editor" mode="python" src="day1.py"></wc-codemirror>
+  <button onclick="execute()">Run</button>
+
+  <py-config>
+  {
+    "files": {
+      "day1.txt": "day1.txt"
+    }
+  }
+  </py-config>      
+  
+  <py-script id="script"></py-script>
+  <div id="tmp"></div>
+
+  <script>
+    const LAST = 1;
+
+    for (let day = 1; day <= LAST; day++) {
+      days.add(new Option(`Day ${day}`, `day${day}`));
+    }
+
+    // nasty hack but the element keeps a static reference to this ¯\_(ツ)_/¯
+    const clear = () => (code = script.querySelector("code")) && (code.innerHTML = '');
+    
+    const select = (day) => editor.src = `${day}.py`;
+
+    function execute() {
+      clear();
+      tmp.innerHTML = `<py-script>${editor.value}</py-script>`;
+    }
+  </script> 
+</body>
+</html>
+
