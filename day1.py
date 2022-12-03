@@ -9,4 +9,5 @@ print(res)
 
 # part 2
 res = sum(sorted(map(sum, cals))[-3:])
+
 print(res)
