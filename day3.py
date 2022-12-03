@@ -1,6 +1,6 @@
 """https://adventofcode.com/2022/day/3"""
 
-from functools import reduce
+from utils import reduce
 
 INPUT = [line.rstrip() for line in open("day3.txt", encoding="utf-8")]
 
