@@ -1,48 +1,53 @@
 <!doctype html>
 <html>
-  <head>
-    <script type="module" src="https://cdn.jsdelivr.net/gh/vanillawc/wc-codemirror@1/index.js"></script>
-    <script type="module" src="https://cdn.jsdelivr.net/gh/vanillawc/wc-codemirror@1/mode/python/python.js"></script>
-    <script src="pyscript.js" type="module"></script>
-    <title>Advent of Code 2022</title>
-    <link rel="icon" href="https://adventofcode.com/favicon.png">
-  </head>
+
+<head>
+  <script type="module" src="https://cdn.jsdelivr.net/gh/vanillawc/wc-codemirror@1/index.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/gh/vanillawc/wc-codemirror@1/mode/python/python.js"></script>
+  <script src="https://pyscript.net/tech-preview/micropython/micropython.js"></script>
+  <title>Advent of Code 2022</title>
+  <link rel="icon" href="https://adventofcode.com/favicon.png">
+</head>
+
 <body>
   <select id="days" onchange="select(event.target.value)"></select>
   <wc-codemirror id="editor" mode="python" src="day1.py"></wc-codemirror>
   <button onclick="execute()">Run</button>
-
-  <py-config>
-  {
-    "files": {
-      "utils.py": "utils.py",
-      "day1.txt": "day1.txt",
-      "day2.txt": "day2.txt",
-      "day3.txt": "day3.txt"
-    }
-  }
-  </py-config>      
-  
-  <py-script id="script"></py-script>
-  <div id="tmp"></div>
+  <pre><code id="output"></code></pre>
 
   <script>
-    const LAST = 3;
+    const LAST = 5;
+    const FILES = ["utils.py"];
 
     for (let day = 1; day <= LAST; day++) {
       days.add(new Option(`Day ${day}`, `day${day}`));
+      FILES.push(`day${day}.txt`);
     }
 
-    // nasty hack but the element keeps a static reference to this ¯\_(ツ)_/¯
-    const clear = () => (code = script.querySelector("code")) && (code.innerHTML = '');
-    
-    const select = (day) => editor.src = `${day}.py`;
+    const clear = () => output.innerText = '';
+
+    const select = (day) => {
+      editor.src = `${day}.py`;
+      clear();
+    }
 
     function execute() {
       clear();
-      tmp.innerHTML = `<py-script>${editor.value}</py-script>`;
+      mp_js_do_str(editor.value);
     }
-  </script> 
-</body>
-</html>
 
+    // Micropython
+    FILES.forEach(path => fetch(path).then(r => r.text().then(f => Module.FS.writeFile(path, f))));
+
+    document.addEventListener('micropython-print', (e) => output.innerText += e.data);
+
+    let mp_js_startup = Module['onRuntimeInitialized'];
+    Module["onRuntimeInitialized"] = async function () {
+      mp_js_startup();
+      mp_js_init(1024 * 1024); // 1Mb
+    }
+
+  </script>
+</body>
+
+</html>
